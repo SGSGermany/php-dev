@@ -48,6 +48,21 @@ if [ "$1" == "php-fpm" ]; then
             exit 1
         fi
 
+        if [ ! -e "/run/php-fpm/$FPM_POOL" ]; then
+            mkdir "/run/php-fpm/$FPM_POOL"
+            chown www-data:www-data "/run/php-fpm/$FPM_POOL"
+            chmod 750 "/run/php-fpm/$FPM_POOL"
+        fi
+        if [ ! -e "/var/log/php/$FPM_POOL" ]; then
+            mkdir "/var/log/php/$FPM_POOL"
+            chown www-data:www-data "/var/log/php/$FPM_POOL"
+            chmod 750 "/var/log/php/$FPM_POOL"
+        fi
+        if [ ! -e "/var/www/php$FPM_POOL" ]; then
+            mkdir "/var/www/php$FPM_POOL"
+            chown www-data:www-data "/var/www/php$FPM_POOL"
+        fi
+
         "php-fpm$FPM_POOL" -F &> /dev/null &
         FPM_POOLS+=( $! )
     done
