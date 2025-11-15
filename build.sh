@@ -419,7 +419,8 @@ cmd buildah config \
     "$CONTAINER"
 
 cmd buildah config \
-    --workingdir "/var/www" \
+    --workingdir "/var/www/html" \
+    --entrypoint '[ "/entrypoint.sh" ]' \
     --cmd '[ "php-fpm" ]' \
     "$CONTAINER"
 
