@@ -67,12 +67,19 @@ pkg_install "$CONTAINER" \
 # install OpenSSH server and common user tools
 pkg_install "$CONTAINER" \
     openssh-server \
+    locales \
     bash-completion \
     man-db \
     manpages \
     vim \
     less \
     curl
+
+echo + "sed -i 's/#^[ \t]*\(en_US.UTF-8 UTF-8\)/\1/' $(quote "…/etc/locale.gen")" >&2
+sed -i 's/^#[ \t]*\(en_US.UTF-8 UTF-8\)/\1/' "$MOUNT/etc/locale.gen"
+
+cmd buildah run "$CONTAINER" -- \
+    locale-gen
 
 # prepare users
 user_changeuid "$CONTAINER" www-data 65536
