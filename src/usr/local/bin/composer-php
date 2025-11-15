@@ -1,0 +1,32 @@
+#!/bin/bash
+# PHP Development Environment
+# A Debian-based PHP development environment running php-fpm.
+#
+# Copyright (c) 2025  SGS Serious Gaming & Simulations GmbH
+#
+# This work is licensed under the terms of the MIT license.
+# For a copy, see LICENSE file or <https://opensource.org/licenses/MIT>.
+#
+# SPDX-License-Identifier: MIT
+# License-Filename: LICENSE
+
+PHP="php"
+COMPOSER="composer-latest"
+
+if [[ "$(basename "$0")" =~ ^composer-(php[0-9]\.[0-9])$ ]]; then
+    PHP="${BASH_REMATCH[1]}"
+    case "$PHP" in
+        "php5.6"|"php7.0"|"php7.1") COMPOSER="composer-2.2.x" ;;
+        *) ;;
+    esac
+fi
+
+PHP="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP" ] && [ -x "$PHP" ] \
+    || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
+
+COMPOSER="$(type -P "$COMPOSER" 2> /dev/null)"
+[ -n "$COMPOSER" ] && [ -x "$COMPOSER" ] \
+    || { echo "Invalid Composer executable \`$COMPOSER\`: No such executable" >&2; exit 1; }
+
+exec "$PHP" -f "$COMPOSER" -- "$@"

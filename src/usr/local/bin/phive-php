@@ -1,0 +1,35 @@
+#!/bin/bash
+# PHP Development Environment
+# A Debian-based PHP development environment running php-fpm.
+#
+# Copyright (c) 2025  SGS Serious Gaming & Simulations GmbH
+#
+# This work is licensed under the terms of the MIT license.
+# For a copy, see LICENSE file or <https://opensource.org/licenses/MIT>.
+#
+# SPDX-License-Identifier: MIT
+# License-Filename: LICENSE
+
+PHP="php"
+PHIVE="phive-latest"
+
+if [[ "$(basename "$0")" =~ ^phive-(php[0-9]\.[0-9])$ ]]; then
+    PHP="${BASH_REMATCH[1]}"
+    case "$PHP" in
+        "php5.6"|"php7.0") PHIVE="phive-0.12.1" ;;
+        "php7.1")          PHIVE="phive-0.13" ;;
+        "php7.2")          PHIVE="phive-0.14" ;;
+        "php7.3"|"php7.4") PHIVE="phive-0.15" ;;
+        *) ;;
+    esac
+fi
+
+PHP="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP" ] && [ -x "$PHP" ] \
+    || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
+
+PHIVE="$(type -P "$PHIVE" 2> /dev/null)"
+[ -n "$PHIVE" ] && [ -x "$PHIVE" ] \
+    || { echo "Invalid PHIVE executable \`$PHIVE\`: No such executable" >&2; exit 1; }
+
+exec "$PHP" -f "$PHIVE" -- "$@"

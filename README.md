@@ -1,4 +1,14 @@
 PHP Development Environment
 ===========================
 
-A Debian-based PHP development environment running php-fpm.
+A Debian-based PHP development environment running `php-fpm`.
+
+This container (published at `ghcr.io/SGSGermany/php-dev`) uses [@oerdnj](https://github.com/oerdnj)'s (Ondřej Surý) [PHP backports repository](https://deb.sury.org/) for [Debian](https://www.debian.org/). Thanks to Ondřej Surý's ([@oerdnj](https://github.com/oerdnj)) amazing work it also includes backported security patches for PHP versions that have reached their official end-of-life already (for quite a while actually).
+
+This container is solely meant for development purposes, not to run a production server. To run a `php-fpm` production server, use [@SGSGermany](https://github.com/SGSGermany)'s [`php-fpm` container](https://github.com/SGSGermany/php-fpm) based on [Alpine Linux](https://alpinelinux.org/) (published at `ghcr.io/SGSGermany/php-fpm`), and limited to officially supported PHP versions. It is strongly recommended to use these containers for Continueos Integration (CI), too.
+
+The container installs not just `php-fpm`, but also `php-cli`, [Xdebug](https://xdebug.org/), [Composer](https://getcomposer.org/), and [PHIVE](https://phar.io/). It also includes a rather comprehensive list of PHP extensions and modules, as well as [PEAR](https://pear.php.net/) and [PECL](https://pecl.php.net/). Xdebug is disabled by default. If the container is started with a `/run/mysql/mysql.sock` socket file present, the container uses `socat` to redirect the [MySQL](https://www.mysql.com/) TCP port 3306 to this Unix socket.
+
+The container also includes an [OpenSSH](https://www.openssh.org/) server listening on TCP port 22 (must be exposed manually), but is disabled by default. To enable Xdebug, to start the SSH server, and to enable the login of the `www-data` user, run the container's [`/dev.sh` script](./src/dev.sh) with the `--on`, `--off`, `--toggle`, or `--auto` options. This script is also called by the container's entrypoint, but doesn't do anything unless the `ENABLE_DEVELOPER_MODE` environment variable is set to `"yes"`. You must then also pass the file-based `www-data_password` container secret to set the password of the `www-data` user, and optionally the `ssh_host_{rsa,ecdsa,ed25519}_key` container secrets to set SSH host keys.
+
+You can tell the container what `php-fpm` pools to start using the `PHP_MILESTONES` and `PHP_MILESTONE` environment variables. `PHP_MILESTONES` is a space separated list of PHP versions (e.g. `"5.6 7.4 8.2"`), `PHP_MILESTONE` is the supposed default PHP version. By default, `PHP_MILESTONES` is populated with all supported PHP versions, and `PHP_MILESTONE` with the latest stable version. Unset `PHP_MILESTONES` to start just the `php-fpm` pool of `PHP_MILESTONE`, or set it to a custom list of PHP versions. If doing the latter, you must either also update `PHP_MILESTONE`, or unset it to use the PHP version listed last in `PHP_MILESTONES` as default PHP version. If neither `PHP_MILESTONES` nor `PHP_MILESTONE` are set, just the `php-fpm` pool of the latest stable PHP version is started.

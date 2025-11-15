@@ -1,0 +1,32 @@
+#!/bin/bash
+# PHP Development Environment
+# A Debian-based PHP development environment running php-fpm.
+#
+# Copyright (c) 2025  SGS Serious Gaming & Simulations GmbH
+#
+# This work is licensed under the terms of the MIT license.
+# For a copy, see LICENSE file or <https://opensource.org/licenses/MIT>.
+#
+# SPDX-License-Identifier: MIT
+# License-Filename: LICENSE
+
+set -eu -o pipefail
+export LC_ALL=C.UTF-8
+
+SIGNAL="${1:-0}"
+PID_FILE="/run/sshd.pid"
+
+[ -e "$PID_FILE" ] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}: No such file or directory" >&2; exit 1; }
+[ -f "$PID_FILE" ] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}: Not a file" >&2; exit 1; }
+[ -r "$PID_FILE" ] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}: Permission denied" >&2; exit 1; }
+
+PID="$(cat "$PID_FILE")"
+[[ "$PID" =~ ^[1-9][0-9]*$ ]] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}: Invalid file format" >&2; exit 1; }
+
+PID_CMD="$(ps -eo pid=,comm= | sed -ne "s/^ *$PID \(.*\)$/\1/p")"
+[ -n "$PID" ] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}: No such process #$PID" >&2; exit 1; }
+[ "$PID_CMD" == "sshd" ] || { echo "Invalid \`sshd\` PID file ${PID_FILE@Q}:" \
+    "Process #$PID is not \`sshd\`, but \`$PID_CMD\`" >&2; exit 1; }
+
+echo "Sending $SIGNAL signal to process #$PID"
+kill -"$SIGNAL" "$PID"
