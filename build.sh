@@ -241,7 +241,7 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
 done
 
 setup_dangling_alternatives "$CONTAINER" \
-    "/run/php-fpm/php-fpm.sock" "php-fpm.sock" "/run/php-fpm/%s/php-fpm_www.sock" \
+    "/run/php-fpm/php-fpm_www.sock" "php-fpm_www.sock" "/run/php-fpm/%s/php-fpm_www.sock" \
     "$PHP_LATEST_MILESTONE" "${PHP_MILESTONES[@]}"
 
 cmd buildah run "$CONTAINER" -- \

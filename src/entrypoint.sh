@@ -80,7 +80,7 @@ if [ "$1" == "php-fpm" ]; then
         update-alternatives --quiet --set html "/var/www/php$PHP_MILESTONE"
         update-alternatives --quiet --set php-fpm "/usr/sbin/php-fpm$PHP_MILESTONE"
         [ ! -e "/etc/php/$PHP_MILESTONE/fpm/pool.d/www.conf" ] \
-            || update-alternatives --quiet --set php-fpm.sock "/run/php-fpm/$PHP_MILESTONE/php-fpm_www.sock"
+            || update-alternatives --quiet --set php-fpm_www.sock "/run/php-fpm/$PHP_MILESTONE/php-fpm_www.sock"
 
         [ -e "/usr/local/bin/pie-php$PHP_MILESTONE" ] \
             && update-alternatives --quiet --set pie "/usr/local/bin/pie-php$PHP_MILESTONE" \
@@ -92,14 +92,14 @@ if [ "$1" == "php-fpm" ]; then
     # abbreviate symlinks on container volumes
     HTML_TARGET="$(update-alternatives --query html \
         | sed -ne 's#^Value: /var/www/\(php[0-9]\.[0-9]\)$#\1#p')"
-    FPM_SOCKET_TARGET="$(update-alternatives --query php-fpm.sock \
+    FPM_SOCKET_TARGET="$(update-alternatives --query php-fpm_www.sock \
         | sed -ne 's#^Value: /run/php-fpm/\([0-9]\.[0-9]/..*\)$#\1#p')"
 
     rm -f "/var/www/html"
     [ -z "$HTML_TARGET" ] || ln -s "$HTML_TARGET/" "/var/www/html"
 
-    rm -f "/run/php-fpm/php-fpm.sock"
-    [ -z "$FPM_SOCKET_TARGET" ] || ln -s "$FPM_SOCKET_TARGET" "/run/php-fpm/php-fpm.sock"
+    rm -f "/run/php-fpm/php-fpm_www.sock"
+    [ -z "$FPM_SOCKET_TARGET" ] || ln -s "$FPM_SOCKET_TARGET" "/run/php-fpm/php-fpm_www.sock"
 
     # wait for *any* of the `php-fpm` pools to exit
     # i.e., this script quits if one of the `php-fpm` pools quit
