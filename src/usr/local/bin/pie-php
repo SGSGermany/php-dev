@@ -1,0 +1,29 @@
+#!/bin/bash
+# PHP Development Environment
+# A Debian-based PHP development environment running php-fpm.
+#
+# Copyright (c) 2025  SGS Serious Gaming & Simulations GmbH
+#
+# This work is licensed under the terms of the MIT license.
+# For a copy, see LICENSE file or <https://opensource.org/licenses/MIT>.
+#
+# SPDX-License-Identifier: MIT
+# License-Filename: LICENSE
+
+PHP="php"
+PIE="pie-latest"
+
+if [[ "$(basename "$0")" =~ ^pie-(php[0-9]\.[0-9])$ ]]; then
+    PHP="${BASH_REMATCH[1]}"
+    # PIE never supported anything else than PHP 8.1+ only
+fi
+
+PHP="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP" ] && [ -x "$PHP" ] \
+    || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
+
+PIE="$(type -P "$PIE" 2> /dev/null)"
+[ -n "$PIE" ] && [ -x "$PIE" ] \
+    || { echo "Invalid PIE executable \`$PIE\`: No such executable" >&2; exit 1; }
+
+exec "$PHP" -f "$PIE" -- "$@"
