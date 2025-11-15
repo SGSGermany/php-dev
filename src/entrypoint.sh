@@ -89,6 +89,18 @@ if [ "$1" == "php-fpm" ]; then
         update-alternatives --quiet --set phive "/usr/local/bin/phive-php$PHP_MILESTONE"
     fi
 
+    # abbreviate symlinks on container volumes
+    HTML_TARGET="$(update-alternatives --query html \
+        | sed -ne 's#^Value: /var/www/\(php[0-9]\.[0-9]\)$#\1#p')"
+    FPM_SOCKET_TARGET="$(update-alternatives --query php-fpm.sock \
+        | sed -ne 's#^Value: /run/php-fpm/\([0-9]\.[0-9]/..*\)$#\1#p')"
+
+    rm -f "/var/www/html"
+    [ -z "$HTML_TARGET" ] || ln -s "$HTML_TARGET/" "/var/www/html"
+
+    rm -f "/run/php-fpm/php-fpm.sock"
+    [ -z "$FPM_SOCKET_TARGET" ] || ln -s "$FPM_SOCKET_TARGET" "/run/php-fpm/php-fpm.sock"
+
     # wait for *any* of the `php-fpm` pools to exit
     # i.e., this script quits if one of the `php-fpm` pools quit
     # if running as PID1, `dumb-init` will kill all other processes
