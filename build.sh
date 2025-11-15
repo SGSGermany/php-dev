@@ -326,6 +326,10 @@ done
 php_composer_install "$CONTAINER" "latest-stable" "/usr/local/bin/composer-latest"
 php_composer_install "$CONTAINER" "latest-2.2.x" "/usr/local/bin/composer-2.2.x"
 
+cmd buildah run "$CONTAINER" -- \
+    update-alternatives --install "/usr/local/bin/composer" "composer" \
+        "/usr/local/bin/composer-latest" "99"
+
 for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     echo + "ln -s composer-php $(quote "…/usr/local/bin/composer-php$PHP_MILESTONE")" >&2
     ln -s composer-php "$MOUNT/usr/local/bin/composer-php$PHP_MILESTONE"
@@ -345,6 +349,10 @@ php_phive_install "$CONTAINER" "0.14.5" "/usr/local/bin/phive-0.14"
 php_phive_install "$CONTAINER" "0.13.5" "/usr/local/bin/phive-0.13"
 php_phive_install "$CONTAINER" "0.12.4" "/usr/local/bin/phive-0.12"
 php_phive_install "$CONTAINER" "0.12.1" "/usr/local/bin/phive-0.12.1"
+
+cmd buildah run "$CONTAINER" -- \
+    update-alternatives --install "/usr/local/bin/phive" "phive" \
+        "/usr/local/bin/phive-latest" "99"
 
 for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     echo + "ln -s phive-php $(quote "…/usr/local/bin/phive-php$PHP_MILESTONE")" >&2
