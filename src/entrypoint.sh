@@ -41,6 +41,16 @@ if [ "$1" == "php-fpm" ]; then
         || cron -L 7 &> /dev/null
 
     # start php-fpm pools
+    ensure_dir() {
+        local DIR="$1" OWNER="${2:-}" MODE="${3:-}"
+
+        [ -d "$DIR" ] || mkdir "$DIR"
+        [ -z "$OWNER" ] || [ "$(stat -c '%U:%G' "$DIR")" == "$OWNER" ] || chown "$OWNER" "$DIR"
+        [ -z "$MODE" ] || [ "$(stat -c '%a' "$DIR")" == "$MODE" ] || chmod "$MODE" "$DIR"
+    }
+
+    ensure_dir "/tmp/php"
+
     FPM_POOLS=()
     for FPM_POOL in ${PHP_MILESTONES:-""}; do
         if [ ! -x "$(which "php-fpm$FPM_POOL" 2> /dev/null)" ]; then
@@ -48,20 +58,13 @@ if [ "$1" == "php-fpm" ]; then
             exit 1
         fi
 
-        if [ ! -e "/run/php-fpm/$FPM_POOL" ]; then
-            mkdir "/run/php-fpm/$FPM_POOL"
-            chown www-data:www-data "/run/php-fpm/$FPM_POOL"
-            chmod 750 "/run/php-fpm/$FPM_POOL"
-        fi
-        if [ ! -e "/var/log/php/$FPM_POOL" ]; then
-            mkdir "/var/log/php/$FPM_POOL"
-            chown www-data:www-data "/var/log/php/$FPM_POOL"
-            chmod 750 "/var/log/php/$FPM_POOL"
-        fi
-        if [ ! -e "/var/www/php$FPM_POOL" ]; then
-            mkdir "/var/www/php$FPM_POOL"
-            chown www-data:www-data "/var/www/php$FPM_POOL"
-        fi
+        ensure_dir "/run/php-fpm/$FPM_POOL" www-data:www-data 750
+        ensure_dir "/tmp/php/$FPM_POOL" www-data:www-data 750
+        ensure_dir "/tmp/php/$FPM_POOL/php-tmp" www-data:www-data 750
+        ensure_dir "/tmp/php/$FPM_POOL/php-uploads" www-data:www-data 750
+        ensure_dir "/tmp/php/$FPM_POOL/php-session" www-data:www-data 750
+        ensure_dir "/var/log/php/$FPM_POOL" www-data:www-data 750
+        ensure_dir "/var/www/php$FPM_POOL" www-data:www-data
 
         "php-fpm$FPM_POOL" -F &> /dev/null &
         FPM_POOLS+=( $! )

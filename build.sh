@@ -43,7 +43,6 @@ rsync -v -rl --exclude '.gitignore' "$BUILD_DIR/src/" "$MOUNT/"
 cmd buildah run "$CONTAINER" -- \
     chmod 750 \
         "/run/php-fpm" \
-        "/tmp/php" \
         "/var/log/php"
 
 # install runtime dependencies
