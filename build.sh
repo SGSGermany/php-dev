@@ -40,11 +40,6 @@ MOUNT="$(buildah mount "$CONTAINER")"
 echo + "rsync -v -rl --exclude .gitignore ./src/ …/" >&2
 rsync -v -rl --exclude '.gitignore' "$BUILD_DIR/src/" "$MOUNT/"
 
-cmd buildah run "$CONTAINER" -- \
-    chmod 750 \
-        "/run/php-fpm" \
-        "/var/log/php"
-
 # install runtime dependencies
 pkg_install "$CONTAINER" \
     dumb-init \
