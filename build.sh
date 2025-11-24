@@ -302,16 +302,16 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
         "decorate_workers_output" "yes" \
         "clear_env" "yes"
 
-    PHP_FPM_ENV=( "/usr/local/sbin" "/usr/local/bin" "/usr/sbin" "/usr/bin" "/sbin" "/bin" )
+    PHP_FPM_PATH_ENV=( "/usr/local/sbin" "/usr/local/bin" "/usr/sbin" "/usr/bin" "/sbin" "/bin" )
     cmd php_patch_config_list "$CONTAINER" "/etc/php/$PHP_MILESTONE/fpm/pool.d/www.conf" \
         "env" \
         "env[HOSTNAME] = \$HOSTNAME" \
-        "env[PATH] = $(IFS=:; echo "${PHP_FPM_ENV[*]}")" \
+        "env[PATH] = $(IFS=:; echo "${PHP_FPM_PATH_ENV[*]}")" \
         "env[TMPDIR] = /tmp/php/$PHP_MILESTONE/php-tmp/" \
         "env[XDEBUG_MODE] = \$XDEBUG_MODE" \
         "env[XDEBUG_CONFIG] = \$XDEBUG_CONFIG"
 
-    PHP_FPM_OPEN_BASEDIR=(
+    PHP_FPM_OPEN_BASEDIR_CONF=(
         "/var/www/php$PHP_MILESTONE"
         "/usr/share/php/$PHP_MILESTONE/"
         "/tmp/php/$PHP_MILESTONE/"
@@ -319,7 +319,7 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     )
     cmd php_patch_config_list "$CONTAINER" "/etc/php/$PHP_MILESTONE/fpm/pool.d/www.conf" \
         "php(_admin)?_(flag|value)" \
-        "php_admin_value[open_basedir] = $(IFS=:; echo "${PHP_FPM_OPEN_BASEDIR[*]}")" \
+        "php_admin_value[open_basedir] = $(IFS=:; echo "${PHP_FPM_OPEN_BASEDIR_CONF[*]}")" \
         "php_admin_value[memory_limit] = 128M"
 done
 
