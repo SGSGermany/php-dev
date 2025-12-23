@@ -54,6 +54,7 @@ pkg_install "$CONTAINER" \
     ca-certificates \
     gnupg \
     git \
+    jq \
     patch \
     unzip \
     tar \
