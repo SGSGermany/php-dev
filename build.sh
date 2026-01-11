@@ -47,29 +47,10 @@ pkg_install "$CONTAINER" \
     socat \
     lsof
 
-# install build essentials
-pkg_install "$CONTAINER" \
-    build-essential \
-    rsync \
-    ca-certificates \
-    gnupg \
-    git \
-    jq \
-    patch \
-    unzip \
-    tar \
-    xz-utils
-
-# install OpenSSH server and common user tools
+# install OpenSSH server and implicit dependencies
 pkg_install "$CONTAINER" \
     openssh-server \
-    locales \
-    bash-completion \
-    man-db \
-    manpages \
-    vim \
-    less \
-    curl
+    locales
 
 echo + "sed -i 's/#^[ \t]*\(en_US.UTF-8 UTF-8\)/\1/' $(quote "…/etc/locale.gen")" >&2
 sed -i 's/^#[ \t]*\(en_US.UTF-8 UTF-8\)/\1/' "$MOUNT/etc/locale.gen"
@@ -131,6 +112,9 @@ gpg_recv "$PHP_REPO_KEYRING" "${PHP_REPO_GPG_KEYS[@]}"
 
 echo + "gpg --dearmor -o …/usr/share/keyrings/deb.sury.org-php.gpg $(quote "$PHP_REPO_KEYRING")" >&2
 gpg --dearmor -o "$MOUNT/usr/share/keyrings/deb.sury.org-php.gpg" "$PHP_REPO_KEYRING"
+
+pkg_install "$CONTAINER" \
+    ca-certificates
 
 cmd buildah run "$CONTAINER" -- \
     sh -c 'printf "deb [signed-by=%s] %s %s %s" "$1" "$2" "$(. /etc/os-release ; echo $VERSION_CODENAME)" "main" > "$3"' sh \
@@ -396,6 +380,10 @@ done
 
 cmd buildah run "$CONTAINER" -- \
     update-alternatives --set phive "/usr/local/bin/phive-php$PHP_LATEST_MILESTONE"
+
+# install user packages
+pkg_install "$CONTAINER" \
+    "${USER_PACKAGES[@]}"
 
 # finalize image
 cleanup "$CONTAINER"
