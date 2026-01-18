@@ -74,6 +74,11 @@ if [ "$1" == "php-fpm" ]; then
     if [ -n "$PHP_MILESTONE" ]; then
         sleep 1
 
+        PHP_VERSIONS_JSON="$(jq -e --arg "milestone" "$PHP_MILESTONE" \
+            'map_values(.current = false) | .[$milestone]["current"] = true' \
+            /usr/share/php/versions.json)"
+        printf '%s\n' "$PHP_VERSIONS_JSON" > /usr/share/php/versions.json
+
         update-alternatives --quiet --set php "/usr/bin/php$PHP_MILESTONE"
         update-alternatives --quiet --set phpize "/usr/bin/phpize$PHP_MILESTONE"
         update-alternatives --quiet --set php-config "/usr/bin/php-config$PHP_MILESTONE"

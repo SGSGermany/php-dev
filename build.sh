@@ -163,6 +163,7 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
         --arg "version" "$PHP_VERSION" \
         --arg "full_version" "$PHP_VERSION_STRING" \
         --argjson "latest" "false" \
+        --argjson "current" "false" \
         --arg "php" "/usr/bin/php$PHP_MILESTONE" \
         --arg "phpize" "/usr/bin/phpize$PHP_MILESTONE" \
         --arg "php-config" "/usr/bin/php-config$PHP_MILESTONE" \
@@ -179,9 +180,8 @@ if [ -z "$PHP_LATEST_VERSION" ]; then
     exit 1
 fi
 
-PHP_VERSIONS_JSON="$(cmd jq -e \
-    --arg "milestone" "$PHP_LATEST_MILESTONE" \
-    '.[$milestone]["latest"] = true' <<< "$PHP_VERSIONS_JSON")"
+PHP_VERSIONS_JSON="$(cmd jq -e --arg "milestone" "$PHP_LATEST_MILESTONE" \
+    '.[$milestone] += { "latest": true, "current": true }' <<< "$PHP_VERSIONS_JSON")"
 
 cmd buildah run "$CONTAINER" -- \
     update-alternatives --set php "/usr/bin/php$PHP_LATEST_MILESTONE"
