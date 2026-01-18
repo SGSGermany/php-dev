@@ -21,12 +21,12 @@ if [[ "$(basename "$0")" =~ ^composer-(php[0-9]\.[0-9])$ ]]; then
     esac
 fi
 
-PHP="$(type -P "$PHP" 2> /dev/null)"
-[ -n "$PHP" ] && [ -x "$PHP" ] \
+PHP_PATH="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP_PATH" ] && [ -x "$PHP_PATH" ] \
     || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
 
-COMPOSER="$(type -P "$COMPOSER" 2> /dev/null)"
-[ -n "$COMPOSER" ] && [ -x "$COMPOSER" ] \
+COMPOSER_PATH="$(type -P "$COMPOSER" 2> /dev/null)"
+[ -n "$COMPOSER_PATH" ] && [ -x "$COMPOSER_PATH" ] \
     || { echo "Invalid Composer executable \`$COMPOSER\`: No such executable" >&2; exit 1; }
 
-exec "$PHP" -f "$COMPOSER" -- "$@"
+exec "$PHP_PATH" -f "$COMPOSER_PATH" -- "$@"

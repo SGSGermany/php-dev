@@ -24,12 +24,12 @@ if [[ "$(basename "$0")" =~ ^phive-(php[0-9]\.[0-9])$ ]]; then
     esac
 fi
 
-PHP="$(type -P "$PHP" 2> /dev/null)"
-[ -n "$PHP" ] && [ -x "$PHP" ] \
+PHP_PATH="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP_PATH" ] && [ -x "$PHP_PATH" ] \
     || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
 
-PHIVE="$(type -P "$PHIVE" 2> /dev/null)"
-[ -n "$PHIVE" ] && [ -x "$PHIVE" ] \
+PHIVE_PATH="$(type -P "$PHIVE" 2> /dev/null)"
+[ -n "$PHIVE_PATH" ] && [ -x "$PHIVE_PATH" ] \
     || { echo "Invalid PHIVE executable \`$PHIVE\`: No such executable" >&2; exit 1; }
 
-exec "$PHP" -f "$PHIVE" -- "$@"
+exec "$PHP_PATH" -f "$PHIVE_PATH" -- "$@"

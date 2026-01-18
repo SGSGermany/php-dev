@@ -18,12 +18,12 @@ if [[ "$(basename "$0")" =~ ^pie-(php[0-9]\.[0-9])$ ]]; then
     # PIE never supported anything else than PHP 8.1+ only
 fi
 
-PHP="$(type -P "$PHP" 2> /dev/null)"
-[ -n "$PHP" ] && [ -x "$PHP" ] \
+PHP_PATH="$(type -P "$PHP" 2> /dev/null)"
+[ -n "$PHP_PATH" ] && [ -x "$PHP_PATH" ] \
     || { echo "Invalid PHP executable \`$PHP\`: No such executable" >&2; exit 1; }
 
-PIE="$(type -P "$PIE" 2> /dev/null)"
-[ -n "$PIE" ] && [ -x "$PIE" ] \
+PIE_PATH="$(type -P "$PIE" 2> /dev/null)"
+[ -n "$PIE_PATH" ] && [ -x "$PIE_PATH" ] \
     || { echo "Invalid PIE executable \`$PIE\`: No such executable" >&2; exit 1; }
 
-exec "$PHP" -f "$PIE" -- "$@"
+exec "$PHP_PATH" -f "$PIE_PATH" -- "$@"
