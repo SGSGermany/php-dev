@@ -45,7 +45,8 @@ pkg_install "$CONTAINER" \
     dumb-init \
     cron \
     socat \
-    lsof
+    lsof \
+    jq
 
 # install OpenSSH server and implicit dependencies
 pkg_install "$CONTAINER" \

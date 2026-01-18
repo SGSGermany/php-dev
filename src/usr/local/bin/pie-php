@@ -20,7 +20,7 @@ if [[ "$(basename "$0")" =~ ^pie-(php[0-9]\.[0-9])$ ]]; then
     case "$PHP" in
         "php5.6"|"php7.0"|"php7.1"|"php7.2"|"php7.3"|"php7.4"|"php8.0")
             # PIE itself must run with PHP 8.1 and later, but it can install extensions for any PHP version
-            # in case of such old PHP version, run PIE with PHP 8.1 (earliest supported version)
+            # in case of such old PHP version, run PIE with the latest PHP version installed
             # and tell PIE what `php-config` and `phpize` binaries to use instead
             PHP_VERSION="${PHP:3}"
 
@@ -39,7 +39,7 @@ if [[ "$(basename "$0")" =~ ^pie-(php[0-9]\.[0-9])$ ]]; then
                 --with-phpize-path="$PHPIZE_PATH"
             )
 
-            PHP="php8.1"
+            PHP="php$(jq -r '[.[] | select(.latest == true) | .milestone][-1] // ""' /usr/share/php/versions.json)"
             ;;
 
         *) ;;
