@@ -310,6 +310,15 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
 done
 
 # install PIE (PHP Installer for Extensions)
+pkg_install "$CONTAINER" \
+    gcc \
+    make \
+    autoconf \
+    libtool \
+    bison \
+    re2c \
+    pkg-config
+
 php_pie_install "$CONTAINER" "latest" "/usr/local/bin/pie-latest"
 
 cmd buildah run "$CONTAINER" -- \
