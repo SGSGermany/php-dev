@@ -12,10 +12,38 @@
 
 PHP="php"
 PIE="pie-latest"
+PIE_ARGS=()
 
 if [[ "$(basename "$0")" =~ ^pie-(php[0-9]\.[0-9])$ ]]; then
     PHP="${BASH_REMATCH[1]}"
-    # PIE never supported anything else than PHP 8.1+ only
+
+    case "$PHP" in
+        "php5.6"|"php7.0"|"php7.1"|"php7.2"|"php7.3"|"php7.4"|"php8.0")
+            # PIE itself must run with PHP 8.1 and later, but it can install extensions for any PHP version
+            # in case of such old PHP version, run PIE with PHP 8.1 (earliest supported version)
+            # and tell PIE what `php-config` and `phpize` binaries to use instead
+            PHP_VERSION="${PHP:3}"
+
+            PHP_CONFIG="php-config$PHP_VERSION"
+            PHP_CONFIG_PATH="$(type -P "$PHP_CONFIG" 2> /dev/null)"
+            [ -n "$PHP_CONFIG_PATH" ] && [ -x "$PHP_CONFIG_PATH" ] \
+                || { echo "Invalid php-config executable \`$PHP_CONFIG\`: No such executable" >&2; exit 1; }
+
+            PHPIZE="phpize$PHP_VERSION"
+            PHPIZE_PATH="$(type -P "$PHPIZE" 2> /dev/null)"
+            [ -n "$PHPIZE_PATH" ] && [ -x "$PHPIZE_PATH" ] \
+                || { echo "Invalid phpize executable \`$PHPIZE\`: No such executable" >&2; exit 1; }
+
+            PIE_ARGS+=(
+                --with-php-config="$PHP_CONFIG_PATH"
+                --with-phpize-path="$PHPIZE_PATH"
+            )
+
+            PHP="php8.1"
+            ;;
+
+        *) ;;
+    esac
 fi
 
 PHP_PATH="$(type -P "$PHP" 2> /dev/null)"
@@ -26,4 +54,4 @@ PIE_PATH="$(type -P "$PIE" 2> /dev/null)"
 [ -n "$PIE_PATH" ] && [ -x "$PIE_PATH" ] \
     || { echo "Invalid PIE executable \`$PIE\`: No such executable" >&2; exit 1; }
 
-exec "$PHP_PATH" -f "$PIE_PATH" -- "$@"
+exec "$PHP_PATH" -f "$PIE_PATH" -- "${PIE_ARGS[@]}" "$@"

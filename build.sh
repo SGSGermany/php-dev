@@ -326,11 +326,6 @@ cmd buildah run "$CONTAINER" -- \
         "/usr/local/bin/pie-latest" "99"
 
 for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
-    case "$PHP_MILESTONE" in
-        "5.6"|"7.0"|"7.1"|"7.2"|"7.3"|"7.4"|"8.0") continue ;;
-        *) ;;
-    esac
-
     echo + "ln -s pie-php $(quote "…/usr/local/bin/pie-php$PHP_MILESTONE")" >&2
     ln -s pie-php "$MOUNT/usr/local/bin/pie-php$PHP_MILESTONE"
 
@@ -339,13 +334,8 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
             "/usr/local/bin/pie-php$PHP_MILESTONE" "${PHP_MILESTONE//./}"
 done
 
-if [ -e "$MOUNT/usr/local/bin/pie-php$PHP_LATEST_MILESTONE" ]; then
-    cmd buildah run "$CONTAINER" -- \
-        update-alternatives --set pie "/usr/local/bin/pie-php$PHP_LATEST_MILESTONE"
-else
-    cmd buildah run "$CONTAINER" -- \
-        update-alternatives --auto pie
-fi
+cmd buildah run "$CONTAINER" -- \
+    update-alternatives --set pie "/usr/local/bin/pie-php$PHP_LATEST_MILESTONE"
 
 # install Composer
 php_composer_install "$CONTAINER" "latest-stable" "/usr/local/bin/composer-latest"

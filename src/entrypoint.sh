@@ -85,9 +85,7 @@ if [ "$1" == "php-fpm" ]; then
         [ ! -e "/etc/php/$PHP_MILESTONE/fpm/pool.d/www.conf" ] \
             || update-alternatives --quiet --set php-fpm_www.sock "/run/php-fpm/$PHP_MILESTONE/php-fpm_www.sock"
 
-        [ -e "/usr/local/bin/pie-php$PHP_MILESTONE" ] \
-            && update-alternatives --quiet --set pie "/usr/local/bin/pie-php$PHP_MILESTONE" \
-            || update-alternatives --quiet --auto pie
+        update-alternatives --quiet --set pie "/usr/local/bin/pie-php$PHP_MILESTONE"
         update-alternatives --quiet --set composer "/usr/local/bin/composer-php$PHP_MILESTONE"
         update-alternatives --quiet --set phive "/usr/local/bin/phive-php$PHP_MILESTONE"
     fi
