@@ -239,6 +239,7 @@ cmd buildah run "$CONTAINER" -- \
 # patch PHP config
 for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     PHP_INI_VALUES=(
+        "memory_limit" "$PHP_MEMORY_LIMIT"
         "display_errors" "On"
         "display_startup_errors" "On"
         "error_reporting" "E_ALL"
@@ -305,7 +306,7 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     cmd php_patch_config_list "$CONTAINER" "/etc/php/$PHP_MILESTONE/fpm/pool.d/www.conf" \
         "php(_admin)?_(flag|value)" \
         "php_admin_value[open_basedir]" "$(IFS=:; echo "${PHP_FPM_OPEN_BASEDIR_CONF[*]}")" \
-        "php_admin_value[memory_limit]" "512M"
+        "php_admin_value[memory_limit]" "$PHP_MEMORY_LIMIT"
 done
 
 # install PIE (PHP Installer for Extensions)
