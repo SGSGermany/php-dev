@@ -130,6 +130,7 @@ pkg_install "$CONTAINER" \
     "${PHP_PACKAGES[@]}"
 
 PHP_VERSIONS=()
+PHP_VERSIONS_JSON="{}"
 PHP_LATEST_VERSION=
 
 for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
@@ -156,6 +157,16 @@ for PHP_MILESTONE in "${PHP_MILESTONES[@]}"; do
     echo + "PHP_VERSIONS+=( $(quote "$PHP_VERSION") )" >&2
     PHP_VERSIONS+=( "$PHP_VERSION" )
 
+    PHP_VERSIONS_JSON="$(cmd jq -e \
+        --arg "milestone" "$PHP_MILESTONE" \
+        --arg "version" "$PHP_VERSION" \
+        --arg "full_version" "$PHP_VERSION_STRING" \
+        --argjson "latest" "false" \
+        --arg "php" "/usr/bin/php$PHP_MILESTONE" \
+        --arg "phpize" "/usr/bin/phpize$PHP_MILESTONE" \
+        --arg "php-config" "/usr/bin/php-config$PHP_MILESTONE" \
+        '.[$milestone] = $ARGS.named' <<< "$PHP_VERSIONS_JSON")"
+
     if [ "$PHP_MILESTONE" == "$PHP_LATEST_MILESTONE" ]; then
         echo + "PHP_LATEST_VERSION=$(quote "$PHP_VERSION")" >&2
         PHP_LATEST_VERSION="$PHP_VERSION"
@@ -166,6 +177,10 @@ if [ -z "$PHP_LATEST_VERSION" ]; then
     echo "Failed to determine full PHP $PHP_LATEST_MILESTONE version: Not installed" >&2
     exit 1
 fi
+
+PHP_VERSIONS_JSON="$(cmd jq -e \
+    --arg "milestone" "$PHP_LATEST_MILESTONE" \
+    '.[$milestone]["latest"] = true' <<< "$PHP_VERSIONS_JSON")"
 
 cmd buildah run "$CONTAINER" -- \
     update-alternatives --set php "/usr/bin/php$PHP_LATEST_MILESTONE"
@@ -181,6 +196,9 @@ cmd buildah run "$CONTAINER" -- \
 
 cmd buildah run "$CONTAINER" -- \
     update-alternatives --set phar.phar "/usr/bin/phar.phar$PHP_LATEST_MILESTONE"
+
+echo + "printf '%s\n' $(quote "$PHP_VERSIONS_JSON") > …/usr/share/php/versions.json" >&2
+printf '%s\n' "$PHP_VERSIONS_JSON" > "$MOUNT/usr/share/php/versions.json"
 
 # install alternatives
 setup_dangling_alternatives() {
