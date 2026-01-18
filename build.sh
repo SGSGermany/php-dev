@@ -19,6 +19,9 @@ export LC_ALL=C.UTF-8
 [ -v CI_TOOLS_PATH ] && [ -d "$CI_TOOLS_PATH" ] \
     || { echo "Invalid build environment: Environment variable 'CI_TOOLS_PATH' not set or invalid" >&2; exit 1; }
 
+[ -x "$(which jq 2>/dev/null)" ] \
+    || { echo "Missing build script dependency: jq" >&2; exit 1; }
+
 source "$CI_TOOLS_PATH/helper/common.sh.inc"
 source "$CI_TOOLS_PATH/helper/common-traps.sh.inc"
 source "$CI_TOOLS_PATH/helper/container.sh.inc"
